@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Una página sencilla para capturar pequeñas ideas.">
+  <title>Pequeñas ideas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page-shell">
+    <nav class="topbar" aria-label="Navegación principal">
+      <a class="brand" href="index.html" aria-label="Inicio de Pequeñas ideas">
+        <span class="brand-mark">✦</span>
+        <span>pequeñas ideas</span>
+      </a>
+      <span class="date-label">tu espacio creativo</span>
+    </nav>
+
+    <section class="clock-panel" aria-labelledby="clock-title">
+      <div>
+        <p class="eyebrow">ahora mismo</p>
+        <h2 id="clock-title">Tu momento</h2>
+      </div>
+      <div class="clock-content">
+        <div class="digital-clock" id="digital-clock" aria-live="polite">00:00:00</div>
+        <div class="analog-clock" id="analog-clock" aria-label="Reloj analógico">
+          <span class="clock-number number-12">12</span>
+          <span class="clock-number number-3">3</span>
+          <span class="clock-number number-6">6</span>
+          <span class="clock-number number-9">9</span>
+          <span class="clock-hand hour-hand" id="hour-hand"></span>
+          <span class="clock-hand minute-hand" id="minute-hand"></span>
+          <span class="clock-hand second-hand" id="second-hand"></span>
+          <span class="clock-center"></span>
+        </div>
+        <div class="clock-switch" role="group" aria-label="Formato del reloj">
+          <button class="clock-mode is-active" type="button" data-mode="digital" aria-pressed="true">Digital</button>
+          <button class="clock-mode" type="button" data-mode="analog" aria-pressed="false">Analógico</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">un lugar para empezar</p>
+        <h1 id="page-title">Todo gran proyecto<br><em>comienza pequeño.</em></h1>
+        <p class="hero-text">Anota eso que ronda tu cabeza. Sin filtros, sin presión. Solo una idea cada vez.</p>
+      </div>
+      <div class="hero-stamp" aria-hidden="true">
+        <span>IDEA</span>
+        <strong>01</strong>
+        <span>→ ACCIÓN</span>
+      </div>
+    </section>
+
+    <section class="idea-panel" aria-labelledby="ideas-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">tu colección</p>
+          <h2 id="ideas-title">Ideas en movimiento</h2>
+        </div>
+        <span class="idea-count" id="idea-count">0 ideas</span>
+      </div>
+
+      <form class="idea-form" id="idea-form">
+        <label class="sr-only" for="idea-input">Escribe una idea</label>
+        <input id="idea-input" name="idea" type="text" maxlength="100" placeholder="Escribe una idea breve..." autocomplete="off" required>
+        <button type="submit">Añadir <span aria-hidden="true">↗</span></button>
+      </form>
+
+      <ul class="idea-list" id="idea-list" aria-live="polite">
+        <li class="empty-state" id="empty-state">Tu primera idea está a un pensamiento de distancia.</li>
+      </ul>
+    </section>
+
+    <footer class="footer">
+      <span>hecho para pensar en grande</span>
+      <span>⌁</span>
+    </footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
