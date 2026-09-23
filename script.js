@@ -12,10 +12,7 @@ const clockModes = document.querySelectorAll('.clock-mode');
 
 let ideas = JSON.parse(localStorage.getItem('small-ideas') || '[]');
 
-// Documenta la función updateClock, que actualiza la hora en el reloj digital y analógico.
-/**
- * Actualiza la hora en el reloj digital y analógico.
- */
+
 function updateClock() {
   const now = new Date();
   const hours = now.getHours();
