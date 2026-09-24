@@ -1,100 +1,136 @@
-const form = document.querySelector('#idea-form');
-const input = document.querySelector('#idea-input');
-const list = document.querySelector('#idea-list');
-const count = document.querySelector('#idea-count');
-const emptyState = document.querySelector('#empty-state');
-const digitalClock = document.querySelector('#digital-clock');
-const analogClock = document.querySelector('#analog-clock');
-const hourHand = document.querySelector('#hour-hand');
-const minuteHand = document.querySelector('#minute-hand');
-const secondHand = document.querySelector('#second-hand');
-const clockModes = document.querySelectorAll('.clock-mode');
+const storageKey = 'small-ideas';
 
-let ideas = JSON.parse(localStorage.getItem('small-ideas') || '[]');
+const elements = {
+  ideaForm: document.querySelector('#idea-form'),
+  ideaInput: document.querySelector('#idea-input'),
+  ideaList: document.querySelector('#idea-list'),
+  ideaCount: document.querySelector('#idea-count'),
+  emptyState: document.querySelector('#empty-state'),
+  digitalClock: document.querySelector('#digital-clock'),
+  analogClock: document.querySelector('#analog-clock'),
+  hourHand: document.querySelector('#hour-hand'),
+  minuteHand: document.querySelector('#minute-hand'),
+  secondHand: document.querySelector('#second-hand'),
+  clockModes: document.querySelectorAll('.clock-mode')
+};
 
+const appState = {
+  ideas: loadIdeas()
+};
+
+function loadIdeas() {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey) || '[]');
+  } catch (error) {
+    console.error('Unable to load saved ideas.', error);
+    return [];
+  }
+}
+
+function saveIdeas() {
+  localStorage.setItem(storageKey, JSON.stringify(appState.ideas));
+}
+
+function formatTimePart(value) {
+  return String(value).padStart(2, '0');
+}
 
 function updateClock() {
   const now = new Date();
   const hours = now.getHours();
   const minutes = now.getMinutes();
   const seconds = now.getSeconds();
-  const format = (value) => String(value).padStart(2, '0');
 
-  digitalClock.textContent = `${format(hours)}:${format(minutes)}:${format(seconds)}`;
-  hourHand.style.transform = `rotate(${(hours % 12) * 30 + minutes * 0.5}deg)`;
-  minuteHand.style.transform = `rotate(${minutes * 6 + seconds * 0.1}deg)`;
-  secondHand.style.transform = `rotate(${seconds * 6}deg)`;
+  elements.digitalClock.textContent = `${formatTimePart(hours)}:${formatTimePart(minutes)}:${formatTimePart(seconds)}`;
+  elements.hourHand.style.transform = `rotate(${(hours % 12) * 30 + minutes * 0.5}deg)`;
+  elements.minuteHand.style.transform = `rotate(${minutes * 6 + seconds * 0.1}deg)`;
+  elements.secondHand.style.transform = `rotate(${seconds * 6}deg)`;
 }
 
-clockModes.forEach((modeButton) => {
-  modeButton.addEventListener('click', () => {
-    const isAnalog = modeButton.dataset.mode === 'analog';
+function setClockMode(mode) {
+  const isAnalog = mode === 'analog';
 
-    digitalClock.classList.toggle('is-hidden', isAnalog);
-    analogClock.classList.toggle('is-visible', isAnalog);
-    clockModes.forEach((button) => {
-      const isActive = button === modeButton;
-      button.classList.toggle('is-active', isActive);
-      button.setAttribute('aria-pressed', String(isActive));
-    });
+  elements.digitalClock.classList.toggle('is-hidden', isAnalog);
+  elements.analogClock.classList.toggle('is-visible', isAnalog);
+
+  elements.clockModes.forEach((button) => {
+    const isActive = button.dataset.mode === mode;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
   });
-});
+}
 
 function updateCount() {
-  count.textContent = `${ideas.length} ${ideas.length === 1 ? 'idea' : 'ideas'}`;
+  const totalIdeas = appState.ideas.length;
+  elements.ideaCount.textContent = `${totalIdeas} ${totalIdeas === 1 ? 'idea' : 'ideas'}`;
 }
 
-function saveIdeas() {
-  localStorage.setItem('small-ideas', JSON.stringify(ideas));
+function removeIdea(index) {
+  appState.ideas.splice(index, 1);
+  saveIdeas();
+  renderIdeas();
+}
+
+function createIdeaItem(idea, index) {
+  const item = document.createElement('li');
+  const text = document.createElement('span');
+  const deleteButton = document.createElement('button');
+
+  text.textContent = idea;
+
+  deleteButton.className = 'delete-button';
+  deleteButton.type = 'button';
+  deleteButton.textContent = '×';
+  deleteButton.setAttribute('aria-label', `Delete idea: ${idea}`);
+  deleteButton.addEventListener('click', () => removeIdea(index));
+
+  item.append(text, deleteButton);
+  return item;
 }
 
 function renderIdeas() {
-  list.innerHTML = '';
+  elements.ideaList.innerHTML = '';
 
-  if (ideas.length === 0) {
-    list.append(emptyState);
+  if (appState.ideas.length === 0) {
+    elements.ideaList.append(elements.emptyState);
     updateCount();
     return;
   }
 
-  ideas.forEach((idea, index) => {
-    const item = document.createElement('li');
-    const text = document.createElement('span');
-    const deleteButton = document.createElement('button');
-
-    text.textContent = idea;
-    deleteButton.className = 'delete-button';
-    deleteButton.type = 'button';
-    deleteButton.textContent = '×';
-    deleteButton.setAttribute('aria-label', `Eliminar idea: ${idea}`);
-    deleteButton.addEventListener('click', () => {
-      ideas.splice(index, 1);
-      saveIdeas();
-      renderIdeas();
-    });
-
-    item.append(text, deleteButton);
-    list.append(item);
+  appState.ideas.forEach((idea, index) => {
+    const ideaItem = createIdeaItem(idea, index);
+    elements.ideaList.append(ideaItem);
   });
 
   updateCount();
 }
 
-form.addEventListener('submit', (event) => {
+function handleIdeaSubmit(event) {
   event.preventDefault();
-  const newIdea = input.value.trim();
+
+  const newIdea = elements.ideaInput.value.trim();
 
   if (!newIdea) {
     return;
   }
 
-  ideas.unshift(newIdea);
+  appState.ideas.unshift(newIdea);
   saveIdeas();
   renderIdeas();
-  form.reset();
-  input.focus();
-});
 
+  elements.ideaForm.reset();
+  elements.ideaInput.focus();
+}
+
+function bindEvents() {
+  elements.ideaForm.addEventListener('submit', handleIdeaSubmit);
+
+  elements.clockModes.forEach((modeButton) => {
+    modeButton.addEventListener('click', () => setClockMode(modeButton.dataset.mode));
+  });
+}
+
+bindEvents();
 renderIdeas();
 updateClock();
 setInterval(updateClock, 1000);
